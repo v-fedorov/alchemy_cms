@@ -23,7 +23,7 @@ module Alchemy
     include Alchemy::Touching
     include Alchemy::Hints
 
-    FORBIDDEN_DEFINITION_ATTRIBUTES = %w(contents available_contents amount picture_gallery taggable hint)
+    FORBIDDEN_DEFINITION_ATTRIBUTES = %w(contents available_contents grouped_contents amount picture_gallery taggable hint)
     SKIPPED_ATTRIBUTES_ON_COPY = %w(id position folded created_at updated_at creator_id updater_id cached_tag_list)
 
     acts_as_taggable
@@ -236,9 +236,26 @@ module Alchemy
       available_contents.detect { |d| d['name'] == content_name }
     end
 
+    # Returns the definition for given content_name inside the grouped_contents
+    def grouped_content_description_for(content_name)
+      return nil if grouped_contents.blank?
+      grouped_contents.detect { |d| d['name'] == content_name }
+    end
+
+    def grouped_contents_description_for(content_name)
+      grouped = []
+      grouped_contents.each{|c| grouped << c['contents']}
+      grouped.flatten.detect{ |d| d['name'] == content_name }
+    end
+
     # returns the collection of available essence_types that can be created for this element depending on its description in elements.yml
     def available_contents
       definition['available_contents']
+    end
+
+    # returns the collection of available essence_types that can be created for this element depending on its description in elements.yml
+    def grouped_contents
+      definition['grouped_contents']
     end
 
     # Returns the contents ingredient for passed content name.

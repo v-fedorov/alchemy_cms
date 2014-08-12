@@ -101,6 +101,17 @@ module Alchemy
         ) if content.settings[:deletable]
       end
 
+      # Renders a link for removing multiple content
+      def delete_group_contents_link(contents)
+        link_to_confirm_dialog(
+            render_icon('delete-small'),
+            _t('Do you really want to delete this group?'),
+            alchemy.admin_content_path(contents.map(&:id)),
+            class: 'icon_button small',
+            title: _t('Remove this group')
+        )
+      end
+
       # Renders the label and a remove link for a content.
       def label_and_remove_link(content)
         content_tag :label do

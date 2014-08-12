@@ -8,13 +8,18 @@ module Alchemy
       def new
         @element = Element.find(params[:element_id])
         @options = options_from_params
-        @contents = @element.available_contents
+        @contents = @element.available_contents || @element.grouped_contents
         @content = @element.contents.build
       end
 
       def create
         @element = Element.find(params[:content][:element_id])
-        @content = Content.create_from_scratch(@element, content_params)
+        if @element.grouped_content_description_for(params[:content][:name])
+          @content = Content.create_group_from_scratch(@element, content_params)
+        else
+          @content = []
+          @content << Content.create_from_scratch(@element, content_params)
+        end
         @options = options_from_params
         @html_options = params[:html_options] || {}
         if picture_gallery_editor?
@@ -41,10 +46,13 @@ module Alchemy
       end
 
       def destroy
-        @content = Content.find(params[:id])
-        @content_dom_id = @content.dom_id
-        @notice = _t("Successfully deleted content", content: @content.name_for_label)
-        @content.destroy
+        @content = Content.find(params[:id].split("/"))
+        @element = @content.first.element
+        @position = @content.first.position
+        @content_dom_id = @content.map {|content| [content.dom_id]}
+        @content_group_id = @content.map {|content| content.id}.join('_')
+        @notice = _t("Successfully deleted content group")
+        @content.each(&:destroy)
       end
 
       private

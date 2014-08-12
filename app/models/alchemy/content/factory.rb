@@ -31,11 +31,23 @@ module Alchemy
       # @return [Alchemy::Content]
       #
       def create_from_scratch(element, essence_hash)
-        essence_hash.stringify_keys!
+        essence_hash = essence_hash.stringify_keys!
         if content = build(element, essence_hash)
           content.create_essence!(essence_hash['essence_type'])
         end
         content
+      end
+
+      def create_group_from_scratch(element, essence_hash)
+        contents = []
+        if element.grouped_content_description_for(essence_hash[:name]).blank?
+          log_warning "Could not find any grouped content descriptions for element: #{element.name}"
+        else
+          element.grouped_content_description_for(essence_hash[:name])['contents'].each do |content_hash|
+            contents << Content.create_from_scratch(element, content_hash.symbolize_keys)
+          end
+        end
+        contents
       end
 
       # Makes a copy of source and also copies the associated essence.
@@ -110,7 +122,8 @@ module Alchemy
       #
       def content_description_from_element(element, name)
         element.content_description_for(name) ||
-          element.available_content_description_for(name)
+          element.available_content_description_for(name) ||
+            element.grouped_contents_description_for(name)
       end
 
       # Returns all content descriptions from elements.yml

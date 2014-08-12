@@ -33,11 +33,11 @@ module Alchemy
     # ActsAsList scope
     def scope_condition
       # Fixes a bug with postgresql having a wrong element_id value, if element_id is nil.
-      "element_id = #{element_id || 'null'} AND essence_type = '#{essence_type}'"
+      "element_id = #{element_id || 'null'} AND name = '#{name}'"
     end
 
     # Validations
-    validates :position, uniqueness: {scope: [:element_id, :essence_type]}
+    validates :position, uniqueness: {scope: [:element_id, :name]}
 
     # Essence scopes
     scope :essence_booleans,  -> { where(essence_type: "Alchemy::EssenceBoolean") }

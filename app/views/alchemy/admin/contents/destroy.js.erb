@@ -1,4 +1,7 @@
-$('#<%= @content_dom_id %>').remove();
+<% @content_dom_id.each do |content| %>
+  $('#<%= content[0] %>').remove();
+<% end %>
+$('#element_<%= @element.id %>_group_<%= @content_group_id %>').remove();
 Alchemy.growl('<%= j @notice %>');
 Alchemy.reloadPreview();
 Alchemy.pleaseWaitOverlay(false);
