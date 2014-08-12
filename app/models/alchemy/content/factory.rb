@@ -40,6 +40,7 @@ module Alchemy
 
       def create_group_from_scratch(element, essence_hash)
         contents = []
+        content_group = essence_hash[:name]
         if element.grouped_content_description_for(essence_hash[:name]).blank?
           log_warning "Could not find any grouped content descriptions for element: #{element.name}"
         else
