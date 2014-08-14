@@ -22,6 +22,9 @@ module Alchemy
         end
         @options = options_from_params
         @html_options = params[:html_options] || {}
+        if select_essence_no_values?
+          @options = options_for_select_essence
+        end
         if picture_gallery_editor?
           @content.update_essence(picture_id: params[:picture_id])
           @options = options_for_picture_gallery
@@ -65,10 +68,24 @@ module Alchemy
         params[:content][:essence_type] == 'Alchemy::EssencePicture' && @options[:grouped] == 'true'
       end
 
+      def select_essence_no_values?
+        unless @options[:select_values].present?
+          @content.each do |content|
+            return true if content.essence_type.eql?("Alchemy::EssenceSelect")
+          end
+        end
+      end
+
       def options_for_picture_gallery
         @gallery_pictures = @element.contents.gallery_pictures
         @dragable = @gallery_pictures.size > 1
         @options.merge(dragable: @dragable)
+      end
+
+      def options_for_select_essence
+        select_essence = @content.detect{|c| c.essence_type == "Alchemy::EssenceSelect"}
+        select_values = select_essence.settings
+        @options.merge(select_values)
       end
 
       def essence_editor_locals

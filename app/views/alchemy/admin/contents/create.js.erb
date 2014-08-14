@@ -3,6 +3,7 @@ var content_dom = $("<%= @content_dom_id %>").before();
   content_dom.before("<div id='element_<%= @element.id %>_group_<%= @content.map {|content| content.id}.join('_') %>'><p>Review <%= @content.first.position %> <%= escape_javascript( delete_group_contents_link(@content)) %></p></div>");
   var content_dom = $("#element_<%= @element.id %>_group_<%= @content.map {|content| content.id}.join('_') %>");
 <% end %>
+
 <% @content.each do |content| %>
   <% if params[:was_missing] %>
 
