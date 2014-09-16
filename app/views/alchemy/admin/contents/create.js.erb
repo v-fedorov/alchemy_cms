@@ -15,16 +15,29 @@ var content_dom = $("<%= @content_dom_id %>").before();
   ) %>');
 
   <% else %>
-    content_dom.append('<%= j(
-    render(
-      partial: "alchemy/essences/#{content.essence_partial_name}_editor",
-      locals: {
+    <% if @content.length > 1 %>
+      content_dom.append('<%= j(
+        render(
+          partial: "alchemy/essences/#{content.essence_partial_name}_editor",
+          locals: {
             content: content,
             options: @options.symbolize_keys,
             html_options: @html_options.symbolize_keys
           }
-    )
-  ) %>');
+        )
+      ) %>');
+    <% else %>
+      content_dom.before('<%= j(
+        render(
+          partial: "alchemy/essences/#{content.essence_partial_name}_editor",
+          locals: {
+            content: content,
+            options: @options.symbolize_keys,
+            html_options: @html_options.symbolize_keys
+          }
+        )
+      ) %>');
+    <% end %>
   Alchemy.Buttons.enable();
   Alchemy.growl('<%= j _t("Successfully added content") % {content: content.name_for_label} %>')
 

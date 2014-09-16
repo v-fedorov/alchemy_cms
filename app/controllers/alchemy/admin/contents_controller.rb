@@ -69,10 +69,10 @@ module Alchemy
       end
 
       def select_essence_no_values?
-        unless @options[:select_values].present?
-          @content.each do |content|
-            return true if content.essence_type.eql?("Alchemy::EssenceSelect")
-          end
+        if (@options && @options[:select_values].present?)
+          false
+        else
+          @content.detect{|c| c.essence_type == "Alchemy::EssenceSelect"}
         end
       end
 
@@ -84,8 +84,10 @@ module Alchemy
 
       def options_for_select_essence
         select_essence = @content.detect{|c| c.essence_type == "Alchemy::EssenceSelect"}
-        select_values = select_essence.settings
-        @options.merge(select_values)
+        if select_essence.present?
+          select_values = select_essence.try(:settings)
+          @options.merge(select_values)
+        end
       end
 
       def essence_editor_locals
