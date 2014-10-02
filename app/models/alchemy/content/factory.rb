@@ -19,7 +19,7 @@ module Alchemy
         if (description = content_description(element, essence_hash)).blank?
           raise ContentDefinitionError, "No description found in elements.yml for #{essence_hash.inspect} and #{element.inspect}"
         else
-          new(name: description['name'], element_id: element.id)
+          new(name: description['name'], element_id: element.id, group_name: essence_hash['group_name'])
         end
       end
 
@@ -40,11 +40,12 @@ module Alchemy
 
       def create_group_from_scratch(element, essence_hash)
         contents = []
-        content_group = essence_hash[:name]
+        group_name = essence_hash[:name]
         if element.grouped_content_description_for(essence_hash[:name]).blank?
           log_warning "Could not find any grouped content descriptions for element: #{element.name}"
         else
           element.grouped_content_description_for(essence_hash[:name])['contents'].each do |content_hash|
+            content_hash.merge!({group_name: group_name}.stringify_keys)
             contents << Content.create_from_scratch(element, content_hash.symbolize_keys)
           end
         end
